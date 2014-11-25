@@ -1,0 +1,73 @@
+---
+title       : Power Analysis
+subtitle    : 
+author      : Issa Coulibaly
+job         : 
+framework   : io2012        # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : []            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+---
+
+## Motivation
+
+1. Power of correlation analysis 
+2. Two samples of equal size
+3. A given p value
+4. Power for a range of r
+
+--- .class #id 
+
+## Workflow
+1. User selects a p value
+2. User selects a sample size
+3. User can  view effect of varying sample size
+4. Apllication displays power plot
+5. Application displays a data frame
+
+---
+## Some R codes
+```{r,}
+	r <- seq(.1,1,.02);nr <- length(r);
+	pow<-vector("numeric",length=nr)
+	for (i in 1:nr){
+		result <- pwr.r.test(n = 25, r = r[i],
+												 sig.level = 0.05, power = NULL,
+												 alternative = "two.sided")
+pow[i] <- result$power}
+dat<-data.frame(r=r,power=pow)
+head(dat)
+```
+
+---
+## Output Power plot
+```{r,echo=FALSE}
+r <- seq(.1,1,.02)
+	nr <- length(r)
+	pow<-vector("numeric",length=nr)
+	for (i in 1:nr){
+		result <- pwr.r.test(n = 25, r = r[i],
+												 sig.level = 0.05, power = NULL,
+												 alternative = "two.sided")
+		pow[i] <- result$power}
+	dat<-data.frame(r=r,power=pow)
+
+library(ggplot2);library(pwr);
+		gp<-ggplot(dat, aes(x=r, y=power)) +
+	 geom_line(colour="red", size=1.5) + 
+	#ggtitle(paste("Sample size =",Nb,"\n","p value = ",pv,sep=" "))+
+	xlab("Correlation Coefficient (r)") +
+	ylab("Power") +
+	scale_y_continuous(breaks=seq(0,1,.1)) +
+	scale_x_continuous(breaks=seq(0,1,.1)) +
+	theme( 
+				panel.grid.major=element_blank(),
+				panel.background = element_rect(fill = "lightgreen"))
+
+	print(gp)
+	
+
+```
+---
